@@ -4,17 +4,21 @@ printf '\033]2;INSTALLER\a'
 echo -e "Press \e[1;33many key\e[0m to install the script..."
 read -n 1
 clear
+if [[ "$EUID" -ne 0 ]]; then
+	echo "Sorry, you need to run this as root."
+	exit
+fi
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 if [[ "$DIR" != "/root/lscript" ]]
 then
-	echo -e "You didn't follow the github's simple install instructions.I will try to do it for you..."
+	echo -e "You didn't follow the github's simple install instructions.  I will try to do it for you..."
 	sleep 4
 	if [[ -d /root/lscript ]]
 	then
 		rm -r /root/lscript
 	fi
 	mkdir /root/lscript
-	cp -r "$DIR"/* /root/lscript
+	cp -r "$DIR"/* /root/lscript || exit 1
 	chmod +x /root/lscript/install.sh
 	gnome-terminal -e "bash /root/lscript/install.sh"
 fi
@@ -39,7 +43,7 @@ clear
 echo -e "Copying script to /bin/lscript"
 sleep 1
 mkdir /bin/lscript
-cd /root/lscript
+cd /root/lscript || exit 1
 cp /root/lscript/l /bin/lscript
 cp /root/lscript/lh1 /bin/lscript
 cp /root/lscript/lh2 /bin/lscript
@@ -79,7 +83,7 @@ then
 elif [[ "$UORI" = "i" ]]
 then
 	clear
-	BASHCHECK=$(cat ~/.bashrc | grep "bin/lscript")
+	BASHCHECK=$(grep "bin/lscript" ~/.bashrc)
 	if [[ "$BASHCHECK" != "" ]]
 	then
 		echo -e "I SAID USE i ONLY ONE TIME..........."
